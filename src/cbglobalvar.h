@@ -29,87 +29,114 @@ class CGlobalVariableSet;
 
 class CGlobalVariable
 {
- private:
-  CString m_Name;
-  CString m_Description;
-  // standard fields
-  CString m_Base;
-  CString m_Include;
-  CString m_Lib;
-  CString m_Obj;
-  CString m_Cflags;
-  CString m_Lflags;
-  // user fields
-  CConfiguration m_Fields;
- public:
-  CString& Name(void) { return m_Name; }
-  CString& Description(void) { return m_Description; }
-  CString  Base(void);
-  CString  Include(void);
-  CString  Lib(void);
-  CString& Obj(void) { return m_Obj; }
-  CString& Cflags(void) { return m_Cflags; }
-  CString& Lflags(void) { return m_Lflags; }
- public:
-  static CString Convert(const CString& Value, const int Case = 0);
-  int Count(void);
-  CString GetField(const int Index);
-  CString GetValue(const int Index);
-  void Clear(void);
-  void Add(const CString& Name, const CString& Value);
-  void Remove(const CString& Name);
-  void Read(const TiXmlElement *GlobalVariableRoot);
-  void Write(TiXmlElement *GlobalVariableRoot);
-  void Show(void);
- public:
-  CGlobalVariable(void);
-  ~CGlobalVariable(void);
+private:
+    CString m_Name;
+    CString m_Description;
+    // standard fields
+    CString m_Base;
+    CString m_Include;
+    CString m_Lib;
+    CString m_Obj;
+    CString m_Cflags;
+    CString m_Lflags;
+    // user fields
+    CConfiguration m_Fields;
+public:
+    CString& Name(void)
+    {
+        return m_Name;
+    }
+    CString& Description(void)
+    {
+        return m_Description;
+    }
+    CString  Base(void);
+    CString  Include(void);
+    CString  Lib(void);
+    CString& Obj(void)
+    {
+        return m_Obj;
+    }
+    CString& Cflags(void)
+    {
+        return m_Cflags;
+    }
+    CString& Lflags(void)
+    {
+        return m_Lflags;
+    }
+public:
+    static CString Convert(const CString& Value, const int Case = 0);
+    int Count(void);
+    CString GetField(const int Index);
+    CString GetValue(const int Index);
+    void Clear(void);
+    void Add(const CString& Name, const CString& Value);
+    void Remove(const CString& Name);
+    void Read(const TiXmlElement *GlobalVariableRoot);
+    void Write(TiXmlElement *GlobalVariableRoot);
+    void Show(void);
+public:
+    CGlobalVariable(void);
+    ~CGlobalVariable(void);
 };
 
 class CGlobalVariableSet
 {
- private:
-  CString m_Name;
-  std::vector<CGlobalVariable *> m_Variables;
-  bool m_Active;
-  //bool m_HaveDefaults;
- public:
-  CString& Name(void) { return m_Name; }
-  bool& Active(void) { return m_Active; }
- public:
-  void Clear(void);
-  size_t Count(void) const { return m_Variables.size(); };
-  CGlobalVariable *Get(const size_t Index);
-  CGlobalVariable *Find(const CString& Name);
-  CGlobalVariable *Add(const CString& Name, const CString& Description = "");
-  void Remove(const CString& Name);
-  void Read(const TiXmlElement *GlobalVariableSetRoot);
-  void Write(TiXmlElement *GlobalVariableSetRoot);
-  void Show(void);
- public:
-  CGlobalVariableSet(void);
-  ~CGlobalVariableSet(void);
+private:
+    CString m_Name;
+    std::vector<CGlobalVariable *> m_Variables;
+    bool m_Active;
+    //bool m_HaveDefaults;
+public:
+    CString& Name(void)
+    {
+        return m_Name;
+    }
+    bool& Active(void)
+    {
+        return m_Active;
+    }
+public:
+    void Clear(void);
+    size_t Count(void) const
+    {
+        return m_Variables.size();
+    };
+    CGlobalVariable *Get(const size_t Index);
+    CGlobalVariable *Find(const CString& Name);
+    CGlobalVariable *Add(const CString& Name, const CString& Description = "");
+    void Remove(const CString& Name);
+    void Read(const TiXmlElement *GlobalVariableSetRoot);
+    void Write(TiXmlElement *GlobalVariableSetRoot);
+    void Show(void);
+public:
+    CGlobalVariableSet(void);
+    ~CGlobalVariableSet(void);
 };
 
 class CGlobalVariableConfig
 {
- private:
-  std::vector<CGlobalVariableSet *> m_VariableSets;
- public:
- public:
-  void Clear(void);
-  size_t Count(void) const { return m_VariableSets.size(); };
-  CGlobalVariableSet *Get(const size_t Index);
-  CGlobalVariableSet *Find(const CString& Name);
-  CGlobalVariableSet *Add(const CString& Name);
-  void AddDefault(void);
-  void Remove(const CString& Name);
-  void Read(const TiXmlElement *GlobalVariableConfigRoot);
-  void Write(TiXmlElement *GlobalVariableConfigRoot);
-  void Show(void);
- public:
-  CGlobalVariableConfig(void);
-  ~CGlobalVariableConfig(void);
+private:
+    std::vector<CGlobalVariableSet *> m_VariableSets;
+public:
+public:
+    void Clear(void);
+    size_t Count(void) const
+    {
+        return m_VariableSets.size();
+    };
+    CGlobalVariableSet *Get(const size_t Index);
+    CGlobalVariableSet *Find(const CString& Name);
+    CGlobalVariableSet *Add(const CString& Name);
+    void AddDefault(void);
+    void Remove(const CString& Name);
+    void Read(const TiXmlElement *GlobalVariableConfigRoot);
+    void Write(TiXmlElement *GlobalVariableConfigRoot);
+    void Show(void);
+public:
+    CGlobalVariableConfig(void);
+    ~CGlobalVariableConfig(void);
 };
 
 #endif

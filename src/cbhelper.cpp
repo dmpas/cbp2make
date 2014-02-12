@@ -25,32 +25,30 @@
 void ShowStringList(const CString& Title, const CString& LinePrefix,
                     const CStringList& StringList)
 {
- std::cout<<Title.GetCString()<<": "<<StringList.GetCount()<<std::endl;
- for (int i = 0, n = StringList.GetCount(); i < n; i++)
- {
-  std::cout<<LinePrefix.GetCString()<<" #"<<(i+1)<<": "<<StringList[i].GetString()<<std::endl;
- }
+    std::cout<<Title.GetCString()<<": "<<StringList.GetCount()<<std::endl;
+    for (int i = 0, n = StringList.GetCount(); i < n; i++) {
+        std::cout<<LinePrefix.GetCString()<<" #"<<(i+1)<<": "<<StringList[i].GetString()<<std::endl;
+    }
 }
 
 CString MakefileFriendly(const CString& AString)
 {
- CString result = AString;
- CCharset c("01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
- for (int i = 0; i < result.GetLength(); i++)
- {
-  if (!c.Isset(result[i])) result[i] = '_';
- }
- return result;//UpperCase(result);
+    CString result = AString;
+    CCharset c("01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_");
+    for (int i = 0; i < result.GetLength(); i++) {
+        if (!c.Isset(result[i])) result[i] = '_';
+    }
+    return result;//UpperCase(result);
 }
 
 CString XMLFriendly(const CString& AString)
 {
- return LowerCase(MakefileFriendly(AString));
+    return LowerCase(MakefileFriendly(AString));
 }
 
 CString FlatFileName(const CString& FileName)
 {
- return FindReplaceChar(FindReplaceChar(FileName,'/','_'),'\\','_');
+    return FindReplaceChar(FindReplaceChar(FileName,'/','_'),'\\','_');
 }
 
 //------------------------------------------------------------------------------

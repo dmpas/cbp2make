@@ -32,49 +32,49 @@ class CProjectWeightComparison;
 
 class CWorkspaceUnit
 {
- friend class CCodeBlocksWorkspace;
- friend class CProjectWeightComparison;
- private:
-  CString m_FileName;
-  CStringList m_Depends;
-  CCodeBlocksProject m_Project;
-  int m_Weight;
- public:
-  void Clear(void);
-  void Read(const TiXmlElement* UnitRoot);
-  void Show(void);
-  bool LoadProject(const CString& WorkspacePath);
- public:
-  CWorkspaceUnit(void);
-  ~CWorkspaceUnit(void);
+    friend class CCodeBlocksWorkspace;
+    friend class CProjectWeightComparison;
+private:
+    CString m_FileName;
+    CStringList m_Depends;
+    CCodeBlocksProject m_Project;
+    int m_Weight;
+public:
+    void Clear(void);
+    void Read(const TiXmlElement* UnitRoot);
+    void Show(void);
+    bool LoadProject(const CString& WorkspacePath);
+public:
+    CWorkspaceUnit(void);
+    ~CWorkspaceUnit(void);
 };
 
 class CCodeBlocksWorkspace
 {
- private:
-  CString m_Title;
-  std::vector<CWorkspaceUnit *> m_Units;
-  CStringList m_TargetNames;
-  CStringList m_MakefileNames;
-  CStringList m_MakefilePaths;
-  CStringList m_TargetDeps;
-  CStringList m_MakefileText;
-  CMakefile m_Makefile;
- protected:
-  int CalculateProjectWeight(const size_t Index = 0);
-  void ResolveProjectDependencies(void);
-  void SortProjectsByWeight(void);
- public:
-  void Clear(void);
-  void Read(const TiXmlElement* WorkspaceRoot);
-  bool LoadWorkspaceProjects(const CString& WorkspacePath);
-  bool LoadWorkspace(const CString& FileName);
-  void Show(const bool ShowProjects = false);
-  bool GenerateMakefile(const CString& FileName, CCodeBlocksBuildConfig& Config);
-  void GenerateMakefileText(const CString& FileName, CCodeBlocksBuildConfig& Config);
- public:
-  CCodeBlocksWorkspace(void);
-  ~CCodeBlocksWorkspace(void);
+private:
+    CString m_Title;
+    std::vector<CWorkspaceUnit *> m_Units;
+    CStringList m_TargetNames;
+    CStringList m_MakefileNames;
+    CStringList m_MakefilePaths;
+    CStringList m_TargetDeps;
+    CStringList m_MakefileText;
+    CMakefile m_Makefile;
+protected:
+    int CalculateProjectWeight(const size_t Index = 0);
+    void ResolveProjectDependencies(void);
+    void SortProjectsByWeight(void);
+public:
+    void Clear(void);
+    void Read(const TiXmlElement* WorkspaceRoot);
+    bool LoadWorkspaceProjects(const CString& WorkspacePath);
+    bool LoadWorkspace(const CString& FileName);
+    void Show(const bool ShowProjects = false);
+    bool GenerateMakefile(const CString& FileName, CCodeBlocksBuildConfig& Config);
+    void GenerateMakefileText(const CString& FileName, CCodeBlocksBuildConfig& Config);
+public:
+    CCodeBlocksWorkspace(void);
+    ~CCodeBlocksWorkspace(void);
 };
 
 #endif

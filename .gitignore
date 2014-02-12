@@ -1,0 +1,5 @@
+/obj
+/*.depend
+/bin
+/cbp2make.cbp.mak.unix
+/cbp2make.cbp.mak.windows

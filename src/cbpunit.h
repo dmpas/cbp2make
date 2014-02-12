@@ -31,31 +31,46 @@ class CCodeBlocksProject;
 class CUnitWeightComparison;
 class CBuildUnit
 {
- friend class CUnitWeightComparison;
- private:
-  CString m_FileName;
-  CStringList m_Targets;
-  CString m_CompilerVariable;
-  bool m_DoCompile;
-  bool m_DoLink;
-  int m_Weight;
-  //
-  CString m_ObjectFileName;
- public:
-  CString FileName(void) const { return m_FileName; }
-  CString Extension(void) const;
-  bool BelongToTarget(const CString& TargetName);
-  CString CompilerVariable(void) const { return m_CompilerVariable; }
-  bool DoCompile(void) const { return m_DoCompile; }
-  bool DoLink(void) const { return m_DoLink; }
-  int Weight(void) const { return m_Weight; }
- public:
-  void Clear(void);
-  void Read(const TiXmlElement *UnitRoot);
-  void Show(void);
- public:
-  CBuildUnit(void);
-  ~CBuildUnit(void);
+    friend class CUnitWeightComparison;
+private:
+    CString m_FileName;
+    CStringList m_Targets;
+    CString m_CompilerVariable;
+    bool m_DoCompile;
+    bool m_DoLink;
+    int m_Weight;
+    //
+    CString m_ObjectFileName;
+public:
+    CString FileName(void) const
+    {
+        return m_FileName;
+    }
+    CString Extension(void) const;
+    bool BelongToTarget(const CString& TargetName);
+    CString CompilerVariable(void) const
+    {
+        return m_CompilerVariable;
+    }
+    bool DoCompile(void) const
+    {
+        return m_DoCompile;
+    }
+    bool DoLink(void) const
+    {
+        return m_DoLink;
+    }
+    int Weight(void) const
+    {
+        return m_Weight;
+    }
+public:
+    void Clear(void);
+    void Read(const TiXmlElement *UnitRoot);
+    void Show(void);
+public:
+    CBuildUnit(void);
+    ~CBuildUnit(void);
 };
 
 #endif

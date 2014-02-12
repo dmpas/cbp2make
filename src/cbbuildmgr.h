@@ -31,24 +31,33 @@ class TiXmlElement;
 
 class CCodeBlocksBuildManager
 {
- private:
-  CCodeBlocksWorkspace m_Workspace;
-  CCodeBlocksProject m_Project;
-  CCodeBlocksBuildConfig m_Config;
-  bool m_ProjectLoaded;
-  bool m_WorkspaceLoaded;
- protected:
- public:
-  CPlatformSet& Platforms(void) { return m_Config.Platforms(); }
-  CToolChainSet& ToolChains(void) { return m_Config.ToolChains(); }
-  CCodeBlocksBuildConfig& Config(void) { return m_Config; }
-  void Clear(void);
-  bool LoadProjectOrWorkspace(const CString& FileName);
-  void Show(void);
-  void GenerateMakefile(const CString& FileName);
- public:
-  CCodeBlocksBuildManager(void);
-  ~CCodeBlocksBuildManager(void);
+private:
+    CCodeBlocksWorkspace m_Workspace;
+    CCodeBlocksProject m_Project;
+    CCodeBlocksBuildConfig m_Config;
+    bool m_ProjectLoaded;
+    bool m_WorkspaceLoaded;
+protected:
+public:
+    CPlatformSet& Platforms(void)
+    {
+        return m_Config.Platforms();
+    }
+    CToolChainSet& ToolChains(void)
+    {
+        return m_Config.ToolChains();
+    }
+    CCodeBlocksBuildConfig& Config(void)
+    {
+        return m_Config;
+    }
+    void Clear(void);
+    bool LoadProjectOrWorkspace(const CString& FileName);
+    void Show(void);
+    void GenerateMakefile(const CString& FileName);
+public:
+    CCodeBlocksBuildManager(void);
+    ~CCodeBlocksBuildManager(void);
 };
 
 #endif

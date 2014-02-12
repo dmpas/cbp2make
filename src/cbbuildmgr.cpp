@@ -26,74 +26,64 @@
 
 CCodeBlocksBuildManager::CCodeBlocksBuildManager(void)
 {
- Clear();
+    Clear();
 }
 
 CCodeBlocksBuildManager::~CCodeBlocksBuildManager(void)
 {
- Clear();
+    Clear();
 }
 
 void CCodeBlocksBuildManager::Clear(void)
 {
- m_ProjectLoaded = false;
- m_WorkspaceLoaded = false;
- m_Project.Clear();
- m_Workspace.Clear();
+    m_ProjectLoaded = false;
+    m_WorkspaceLoaded = false;
+    m_Project.Clear();
+    m_Workspace.Clear();
 }
 
 bool CCodeBlocksBuildManager::LoadProjectOrWorkspace(const CString& FileName)
 {
- bool result = false;
- TiXmlDocument cbpw;
- result = cbpw.LoadFile(FileName.GetCString());
- if (!result) return false;
- Clear();
- const TiXmlElement *root = cbpw.RootElement();
- if (0==strcmp(root->Value(),"CodeBlocks_project_file"))
- {
-  m_Project.Read(root);
-  m_ProjectLoaded = true;
-  result = true;
- }
- else if (0==strcmp(root->Value(),"CodeBlocks_workspace_file"))
- {
-  m_Workspace.Read(root);
-  m_Workspace.LoadWorkspaceProjects(ExtractFilePath(FileName));
-  m_WorkspaceLoaded = true;
-  result = true;
- }
- return result;
+    bool result = false;
+    TiXmlDocument cbpw;
+    result = cbpw.LoadFile(FileName.GetCString());
+    if (!result) return false;
+    Clear();
+    const TiXmlElement *root = cbpw.RootElement();
+    if (0==strcmp(root->Value(),"CodeBlocks_project_file")) {
+        m_Project.Read(root);
+        m_ProjectLoaded = true;
+        result = true;
+    } else if (0==strcmp(root->Value(),"CodeBlocks_workspace_file")) {
+        m_Workspace.Read(root);
+        m_Workspace.LoadWorkspaceProjects(ExtractFilePath(FileName));
+        m_WorkspaceLoaded = true;
+        result = true;
+    }
+    return result;
 }
 
 void CCodeBlocksBuildManager::Show(void)
 {
- if (m_ProjectLoaded)
- {
-  std::cout<<"Loaded file is Code::Blocks project."<<std::endl;
-  m_Project.Show();
- }
- else if (m_WorkspaceLoaded)
- {
-  std::cout<<"Loaded file is Code::Blocks workspace."<<std::endl;
-  m_Workspace.Show();
- }
- else
- {
-  std::cout<<"No project or workspace loaded."<<std::endl;
- }
+    if (m_ProjectLoaded) {
+        std::cout<<"Loaded file is Code::Blocks project."<<std::endl;
+        m_Project.Show();
+    } else if (m_WorkspaceLoaded) {
+        std::cout<<"Loaded file is Code::Blocks workspace."<<std::endl;
+        m_Workspace.Show();
+    } else {
+        std::cout<<"No project or workspace loaded."<<std::endl;
+    }
 }
 
 void CCodeBlocksBuildManager::GenerateMakefile(const CString& FileName)
 {
- if (m_ProjectLoaded)
- {
-  m_Project.GenerateMakefile(FileName,m_Config);
- }
- if (m_WorkspaceLoaded)
- {
-  m_Workspace.GenerateMakefile(FileName,m_Config);
- }
+    if (m_ProjectLoaded) {
+        m_Project.GenerateMakefile(FileName,m_Config);
+    }
+    if (m_WorkspaceLoaded) {
+        m_Workspace.GenerateMakefile(FileName,m_Config);
+    }
 }
 
 //------------------------------------------------------------------------------
