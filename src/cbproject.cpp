@@ -1,6 +1,7 @@
 /*
     cbp2make : Makefile generation tool for the Code::Blocks IDE
     Copyright (C) 2010-2013 Mirai Computing (mirai.computing@gmail.com)
+    Copyright (C) 2014      Sergey "dmpas" Batanov (sergey.batanov (at) dmpas (dot) ru)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -622,6 +623,9 @@ bool CCodeBlocksProject::GenerateMakefile
         CString STR_RESINC = DecorateVariableName("ResInc",Config.MacroVariableCase());
         CString STR_LIBDIR = DecorateVariableName("LibDir",Config.MacroVariableCase());
         CString STR_OBJDIR = DecorateVariableName("ObjDir",Config.MacroVariableCase());
+
+        CString STR_DEF = DecorateVariableName("Def",Config.MacroVariableCase());
+        CString STR_SHARED_INT = DecorateVariableName("SharedInt",Config.MacroVariableCase());
         // macros
         CString line = pl->EvalWorkDir();
         m_Makefile.AddMacro(STR_WRKDIR,line,section);
@@ -746,6 +750,30 @@ bool CCodeBlocksProject::GenerateMakefile
             m_Makefile.AddMacro(target->Name(STR_DEP+"_",Config.MacroVariableCase()),pl->Pd(target->ExtDeps()),section);
             CString target_output = target->Output();
             if (CBuildTarget::ttCommands!=target->Type()) {
+                if (target->Type() == CBuildTarget::ttDynamicLibrary) {
+                    CString def_output = target_output + ".def";
+
+                    CString path, name, ext;
+                    SplitFilePathName(target_output, path, name, ext);
+
+                    CString static_output = path + pl->Pd() + "lib" + name + ".a";
+
+                    m_Makefile.AddMacro(target->Name(STR_DEF + "_", Config.MacroVariableCase()),
+                      CGlobalVariable::Convert(
+                        pl->ProtectPath(pl->Pd(def_output),Config.QuotePathMode()),
+                        Config.MacroVariableCase()
+                      ),
+                      section
+                    );
+
+                    m_Makefile.AddMacro(target->Name(STR_SHARED_INT + "_", Config.MacroVariableCase()),
+                      CGlobalVariable::Convert(
+                        pl->ProtectPath(pl->Pd(static_output),Config.QuotePathMode()),
+                        Config.MacroVariableCase()
+                      ),
+                      section
+                    );
+                }
                 if (target->AutoPrefix()) {
                     //std::cout<<"target_output='"<<target_output.GetCString()<<"'"<<std::endl;
                     CString path, name, ext;
@@ -930,6 +958,8 @@ bool CCodeBlocksProject::GenerateMakefile
                         // compose dynamic linkage command
                         cmd_args.SetStringVariable(TPL_LINKER,"$("+DecorateVariableName(linker->MakeVariable()+tc_suffix,Config.MacroVariableCase())+")");
                         cmd_args.SetStringVariable(TPL_EXE_OUTPUT,"$("+target->Name(STR_OUT+"_",Config.MacroVariableCase())+")");
+                        cmd_args.SetStringVariable(TPL_DEF_OUTPUT, "$(" + target->Name(STR_DEF + "_",Config.MacroVariableCase()) + ")");
+                        cmd_args.SetStringVariable(TPL_STATIC_OUTPUT, "$(" + target->Name(STR_SHARED_INT + "_",Config.MacroVariableCase()) + ")");
                         line = linker->MakeCommand(cmd_args);
                         //
                         rule_target_out.Commands().Insert(line);

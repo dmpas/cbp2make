@@ -1,6 +1,7 @@
 /*
     cbp2make : Makefile generation tool for the Code::Blocks IDE
     Copyright (C) 2010-2013 Mirai Computing (mirai.computing@gmail.com)
+    Copyright (C) 2014      Sergey "dmpas" Batanov (sergey.batanov (at) dmpas (dot) ru)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -744,6 +745,9 @@ static const CString TPL_LNK_OBJECTS     = "$link_objects";
 static const CString TPL_LNK_RES_OBJECTS = "$link_resobjects";
 static const CString TPL_LIB_DIRS        = "$libdirs";
 static const CString TPL_LIBS            = "$libs";
+
+static const CString TPL_DEF_OUTPUT      = "$def_output";
+static const CString TPL_STATIC_OUTPUT   = "$static_output";
 //static const CString TPL_ = "$";
 
 #endif

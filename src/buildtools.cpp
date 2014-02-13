@@ -1,6 +1,7 @@
 /*
     cbp2make : Makefile generation tool for the Code::Blocks IDE
     Copyright (C) 2010-2013 Mirai Computing (mirai.computing@gmail.com)
+    Copyright (C) 2014      Sergey "dmpas" Batanov (sergey.batanov (at) dmpas (dot) ru)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -197,9 +198,10 @@ void CBuildTool::Reset(const CPlatform::OS_Type OS)
 
 bool CBuildTool::Supports(const CPlatform::OS_Type OS)
 {
-    return ((CPlatform::OS_Unix==OS)||
-            (CPlatform::OS_Windows==OS)||
-            (CPlatform::OS_Mac==OS));
+    return ((CPlatform::OS_Unix == OS)||
+            (CPlatform::OS_Windows == OS)||
+            (CPlatform::OS_MSys == OS)||
+            (CPlatform::OS_Mac == OS));
 }
 
 void CBuildTool::Read(const TiXmlElement *Root, const CString& Name, CString& Value)
@@ -583,6 +585,10 @@ void CDynamicLinker::Reset(const CPlatform::OS_Type OS)
         m_LibraryExtension = "so";
         break;
     }
+    case CPlatform::OS_MSys: {
+        m_LibraryExtension = "dll";
+        break;
+    }
     case CPlatform::OS_Windows: {
         m_LibraryExtension = "dll";
         break;
@@ -752,10 +758,13 @@ void CGNUCCompiler::Reset(const CPlatform::OS_Type OS)
     m_Description = "GNU C Compiler";
     m_MakeVariable = "CC";
     m_CommandTemplate = "$compiler $options $includes -c $file -o $object";
-    m_SourceExtensions.Clear()<<"c"<<"cc";
+    m_SourceExtensions.Clear() << "c" << "cc";
     m_TargetExtension = "o";
-    if (CPlatform::OS_Windows==OS) m_Program = "gcc.exe";
-    else m_Program = "gcc";
+
+    if (CPlatform::OS_Windows == OS)
+        m_Program = "gcc.exe";
+    else
+        m_Program = "gcc";
 }
 
 //------------------------------------------------------------------------------
@@ -783,10 +792,13 @@ void CGNUCppCompiler::Reset(const CPlatform::OS_Type OS)
     m_Description = "GNU C++ Compiler";
     m_MakeVariable = "CXX";
     m_CommandTemplate = "$compiler $options $includes -c $file -o $object";
-    m_SourceExtensions.Clear()<<"cpp"<<"cxx";
+    m_SourceExtensions.Clear() << "cpp" << "cxx";
     m_TargetExtension = "o";
-    if (CPlatform::OS_Windows==OS) m_Program = "g++.exe";
-    else m_Program = "g++";
+
+    if (CPlatform::OS_Windows==OS)
+        m_Program = "g++.exe";
+    else
+        m_Program = "g++";
 }
 
 //------------------------------------------------------------------------------
@@ -869,7 +881,7 @@ void CGNUWindowsResourceCompiler::Reset(const CPlatform::OS_Type OS)
 
 bool CGNUWindowsResourceCompiler::Supports(const CPlatform::OS_Type OS)
 {
-    return (CPlatform::OS_Windows==OS);
+    return (CPlatform::OS_Windows == OS) || (CPlatform::OS_MSys == OS);
 }
 
 //------------------------------------------------------------------------------
@@ -892,7 +904,7 @@ void CGNUStaticLinker::Reset(const CPlatform::OS_Type OS)
     m_Description = "GNU Static Library Linker";
     m_MakeVariable = "AR";
     m_CommandTemplate = "$lib_linker rcs $static_output $link_objects";
-    m_SourceExtensions.Clear()<<"o"<<"obj";
+    m_SourceExtensions.Clear() << "o" << "obj";
     m_TargetExtension = "a";
     if (CPlatform::OS_Windows==OS) m_Program = "ar.exe";
     else m_Program = "ar";
@@ -919,7 +931,7 @@ void CGNUDynamicLinker::Reset(const CPlatform::OS_Type OS)
     m_MakeVariable = "LD";
     m_CommandTemplate = "$linker -shared $libdirs $link_objects $link_resobjects -o $exe_output $link_options $libs";
     m_SourceExtensions.Clear()<<"o"<<"obj";
-    if (CPlatform::OS_Windows==OS) {
+    if (CPlatform::OS_Windows==OS || CPlatform::OS_MSys==OS) {
         m_Program = "g++.exe";
         m_TargetExtension = "dll";
     } else {
@@ -949,7 +961,12 @@ void CGNUExecutableLinker::Reset(const CPlatform::OS_Type OS)
     m_MakeVariable = "LD";
     m_CommandTemplate = "$linker $libdirs -o $exe_output $link_objects $link_resobjects $link_options $libs";
     m_SourceExtensions.Clear()<<"o"<<"obj";
-    if (CPlatform::OS_Windows==OS) {
+    if (CPlatform::OS_MSys == OS) {
+        m_Program = "g++.exe";
+        m_TargetExtension = "exe";
+        m_Option_WinGUI = "-mwindows";
+    } else
+    if (CPlatform::OS_Windows == OS) {
         m_Program = "g++.exe";
         m_TargetExtension = "exe";
         m_Option_WinGUI = "-mwindows";

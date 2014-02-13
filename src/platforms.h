@@ -1,6 +1,7 @@
 /*
     cbp2make : Makefile generation tool for the Code::Blocks IDE
     Copyright (C) 2010-2013 Mirai Computing (mirai.computing@gmail.com)
+    Copyright (C) 2014      Sergey "dmpas" Batanov (sergey.batanov (at) dmpas (dot) ru)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@
 static const CString STR_UNIX     = "Unix";
 static const CString STR_WINDOWS  = "Windows";
 static const CString STR_MAC      = "Mac";
+static const CString STR_MSYS     = "MSys";
 
 class TiXmlElement;
 class CPlatformSet;
@@ -39,6 +41,7 @@ public:
         OS_Unix,
         OS_Windows,
         OS_Mac,
+        OS_MSys,
         OS_Count
     };
 private:
