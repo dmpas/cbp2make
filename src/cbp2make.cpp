@@ -1,6 +1,7 @@
 /*
     cbp2make : Makefile generation tool for the Code::Blocks IDE
     Copyright (C) 2010-2013 Mirai Computing (mirai.computing@gmail.com)
+    Copyright (C) 2014      Sergey "dmpas" Batanov (sergey.batanov (at) dmpas (dot) ru)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -63,22 +64,22 @@ void CProcessingMachine::DisplayHelpMessage(void)
              "Usage syntax:\n\n"
              "\tGenerate makefile:\n"
              "\t\tcbp2make -in <project_file> [-cfg <configuration>] [-out <makefile>]\n"
-             "\t\t\t [-unix] [-windows] [-mac] [--all-os] [-targets \"<target1>[,<target2>[, ...]]\"]\n"
+             "\t\t\t [-msys] [-unix] [-windows] [-mac] [--all-os] [-targets \"<target1>[,<target2>[, ...]]\"]\n"
              "\t\t\t [--flat-objects] [--flat-objpath] [--wrap-objects] [--wrap-options]\n"
              "\t\t\t [--with-deps] [--keep-objdir] [--keep-outdir] [--target-case keep|lower|upper]\n"
              "\t\t\t [--macros-case keep|lower|upper] [--quote-path auto|never|always]\n"
              "\t\tcbp2make -list -in <project_file_list> [-cfg <configuration>]\n"
-             "\t\t\t [-unix] [-windows] [-mac] [--all-os] [-targets \"<target1>[,<target2>[, ...]]\"]\n"
+             "\t\t\t [-msys] [-unix] [-windows] [-mac] [--all-os] [-targets \"<target1>[,<target2>[, ...]]\"]\n"
              "\t\t\t [--flat-objects] [--flat-objpath] [--wrap-objects] [--wrap-options]\n"
              "\t\t\t [--with-deps] [--keep-objdir] [--keep-outdir] [--target-case keep|lower|upper]\n\n"
              "\t\t\t [--macros-case keep|lower|upper] [--quote-path auto|never|always]\n"
              "\tManage toolchains:\n"
-             "\t\tcbp2make --config toolchain --add [-unix|-windows|-mac] -chain <toolchain>\n"
-             "\t\tcbp2make --config toolchain --remove [-unix|-windows|-mac] -chain <toolchain>\n\n"
+             "\t\tcbp2make --config toolchain --add [-msys|-unix|-windows|-mac] -chain <toolchain>\n"
+             "\t\tcbp2make --config toolchain --remove [-msys|-unix|-windows|-mac] -chain <toolchain>\n\n"
              "\tManage build tools:\n"
-             "\t\tcbp2make --config tool --add [-unix|-windows|-mac] -chain <toolchain>\n"
+             "\t\tcbp2make --config tool --add [-msys|-unix|-windows|-mac] -chain <toolchain>\n"
              "\t\t\t -tool <tool> -type <type> <tool options>\n"
-             "\t\tcbp2make --config tool --remove [-unix|-windows|-mac] -chain <toolchain>\n"
+             "\t\tcbp2make --config tool --remove [-msys|-unix|-windows|-mac] -chain <toolchain>\n"
              "\t\t\t -tool <tool>\n\n"
              "\tTool types:\t pp=preprocessor as=assembler cc=compiler rc=resource compiler\n"
              "\t\t\t sl=static linker dl=dynamic linker el=executable linker\n"
@@ -93,7 +94,7 @@ void CProcessingMachine::DisplayHelpMessage(void)
              "\t\t\t -ldsw <library_dir_switch> -llsw <link_library_switch> -lpfx <library_prefix>\n"
              "\t\t\t -lext <library_extension> -objext <object_extension> -lflat <yes|no>\n\n"
              "\tManage platforms:\n"
-             "\t\tcbp2make --config platform [-unix|-windows|-mac] [-pwd <print_dir_command>]\n"
+             "\t\tcbp2make --config platform [-msys|-unix|-windows|-mac] [-pwd <print_dir_command>]\n"
              "\t\t\t [-cd <change_dir_command>] [-rm <remove_file_command>]\n"
              "\t\t\t [-rmf <remove_file_forced>] [-rmd <remove_dir_command>]\n"
              "\t\t\t [-cp <copy_file_command>] [-mv <move_file_command>]\n"
@@ -160,6 +161,7 @@ void CProcessingMachine::CreateConfiguration(void)
     PSC().InsertStringVariable("-objext","o");
     PSC().InsertStringVariable("-lflat","no");
 
+    PSC().InsertBooleanVariable("-msys");
     PSC().InsertBooleanVariable("-unix");
     PSC().InsertBooleanVariable("-windows");
     PSC().InsertBooleanVariable("-mac");
@@ -396,11 +398,14 @@ bool CProcessingMachine::Configure(const CString& FileName)
     bool os_unix = PSC().VarDefined("-unix");
     bool os_windows = PSC().VarDefined("-windows");
     bool os_mac = PSC().VarDefined("-mac");
+    bool os_msys = PSC().VarDefined("-msys");
     CPlatform::OS_Type os_type = CPlatform::OS_Unix;
+    bool os_any = true;
     if (os_unix) os_type = CPlatform::OS_Unix;
     else if (os_windows) os_type = CPlatform::OS_Windows;
     else if (os_mac) os_type = CPlatform::OS_Mac;
-    bool os_any = os_unix || os_windows || os_mac;
+    else if (os_msys) os_type = CPlatform::OS_MSys;
+    else os_any = false;
 // configure
     m_BuildManager.Config().Platforms().AddDefault();
     if (PSC().VarDefined("--config")) {
@@ -511,7 +516,7 @@ bool CProcessingMachine::Configure(const CString& FileName)
     os_unix = os_unix || os_all;
     os_windows = os_windows || os_all;
     os_mac = os_mac || os_all;
-    bool os_none = !os_all && !os_unix && !os_windows && !os_mac;
+    bool os_none = !os_all && !os_unix && !os_windows && !os_mac &&!os_msys;
     if (os_none) {
 #ifdef OS_UNIX
         os_unix = true;
@@ -525,6 +530,10 @@ bool CProcessingMachine::Configure(const CString& FileName)
     }
     if (os_unix) {
         CPlatform *p = m_BuildManager.Config().Platforms().Find(CPlatform::OS_Unix);
+        if (p) p->Active() = true;
+    }
+    if (os_msys) {
+        CPlatform *p = m_BuildManager.Config().Platforms().Find(CPlatform::OS_MSys);
         if (p) p->Active() = true;
     }
     if (os_windows) {

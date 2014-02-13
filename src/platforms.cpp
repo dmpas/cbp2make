@@ -1,6 +1,7 @@
 /*
     cbp2make : Makefile generation tool for the Code::Blocks IDE
     Copyright (C) 2010-2013 Mirai Computing (mirai.computing@gmail.com)
+    Copyright (C) 2014      Sergey "dmpas" Batanov (sergey.batanov (at) dmpas (dot) ru)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -102,6 +103,9 @@ CString CPlatform::Name(const OS_Type PlatformOS)
     case CPlatform::OS_Mac: {
         return STR_MAC;
     }
+    case CPlatform::OS_MSys: {
+        return STR_MSYS;
+    }
     }
     return "Other";
 }
@@ -111,6 +115,7 @@ CPlatform::OS_Type CPlatform::OS(CString& PlatformName)
     if (PlatformName==STR_UNIX) return CPlatform::OS_Unix;
     if (PlatformName==STR_WINDOWS) return CPlatform::OS_Windows;
     if (PlatformName==STR_MAC) return CPlatform::OS_Mac;
+    if (PlatformName==STR_MSYS) return CPlatform::OS_MSys;
     return CPlatform::OS_Other;
 }
 
@@ -209,7 +214,7 @@ CString CPlatform::ChangeDir(const CString& Path) const
 
 CString CPlatform::MakefileCmd(const CString& Command) const
 {
-    if (OS_Windows==m_OS_Type) return "cmd /c "+Command;
+    if (OS_Windows == m_OS_Type) return "cmd /c "+Command;
     return Command;
 }
 
@@ -249,6 +254,29 @@ void CPlatform::Reset(const CPlatform::OS_Type OS)
         //
         m_StaticLibraryExtensions.Clear()<<"a"<<"lib";
         m_DynamicLibraryExtensions.Clear()<<"so";
+        break;
+    }
+    case CPlatform::OS_MSys: {
+        m_Cmd_Null = "/dev/null";
+        m_Cmd_Copy = "cp -p $src $dst";
+        m_Cmd_Move = "mv $src $dst";
+        m_Cmd_Make = "make $opts -f $file";
+        m_Tool_Make = "make";
+        //m_Cmd_TestFile = "test -f $file";
+        m_Cmd_RemoveFile = "rm $file";
+        m_Cmd_ForceRemoveFile = "rm -f $file";
+        //m_Cmd_TestDir = "test -d $dir";
+        m_Cmd_MakeDir = "mkdir $dir";
+        m_Cmd_TestMakeDir = "test -d $dir || mkdir -p $dir";
+        m_Cmd_ForceMakeDir = "mkdir -p $dir";
+        m_Cmd_RemoveDir = "rm -rf $dir";
+        m_Cmd_PrintWorkDir = "pwd";
+        m_Cmd_EvalWorkDir = "`pwd`";
+        m_Cmd_ChangeDir = "cd $dir";
+        m_PathDelimiter = '/';
+        //
+        m_StaticLibraryExtensions.Clear() << "a" << "lib";
+        m_DynamicLibraryExtensions.Clear() << "dll";
         break;
     }
     case CPlatform::OS_Windows: {
@@ -333,25 +361,25 @@ void CPlatform::Read(const TiXmlElement *PlatformRoot)
      m_ = value;
     }
     */
-    Read(PlatformRoot,"make_file",m_Cmd_Make);
-    Read(PlatformRoot,"make_tool",m_Tool_Make);
-    Read(PlatformRoot,"copy_file",m_Cmd_Copy);
-    Read(PlatformRoot,"move_file",m_Cmd_Move);
-    Read(PlatformRoot,"remove_file",m_Cmd_RemoveFile);
-    Read(PlatformRoot,"force_remove_file",m_Cmd_ForceRemoveFile);
-    Read(PlatformRoot,"make_dir",m_Cmd_MakeDir);
-    Read(PlatformRoot,"test_make_dir",m_Cmd_TestMakeDir);
-    Read(PlatformRoot,"force_make_dir",m_Cmd_ForceMakeDir);
-    Read(PlatformRoot,"remove_dir",m_Cmd_RemoveDir);
-    Read(PlatformRoot,"print_work_dir",m_Cmd_PrintWorkDir);
-    Read(PlatformRoot,"eval_work_dir",m_Cmd_EvalWorkDir);
-    Read(PlatformRoot,"change_dir",m_Cmd_ChangeDir);
+    Read(PlatformRoot, "make_file",             m_Cmd_Make);
+    Read(PlatformRoot, "make_tool",             m_Tool_Make);
+    Read(PlatformRoot, "copy_file",             m_Cmd_Copy);
+    Read(PlatformRoot, "move_file",             m_Cmd_Move);
+    Read(PlatformRoot, "remove_file",           m_Cmd_RemoveFile);
+    Read(PlatformRoot, "force_remove_file",     m_Cmd_ForceRemoveFile);
+    Read(PlatformRoot, "make_dir",              m_Cmd_MakeDir);
+    Read(PlatformRoot, "test_make_dir",         m_Cmd_TestMakeDir);
+    Read(PlatformRoot, "force_make_dir",        m_Cmd_ForceMakeDir);
+    Read(PlatformRoot, "remove_dir",            m_Cmd_RemoveDir);
+    Read(PlatformRoot, "print_work_dir",        m_Cmd_PrintWorkDir);
+    Read(PlatformRoot, "eval_work_dir",         m_Cmd_EvalWorkDir);
+    Read(PlatformRoot, "change_dir",            m_Cmd_ChangeDir);
     {
         CString s;
         CStringList l;
-        Read(PlatformRoot,"static_lib_ext",s);
+        Read(PlatformRoot, "static_lib_ext", s);
         if (!s.IsEmpty()) {
-            ParseStr(s,' ',l);
+            ParseStr(s, ' ', l);
             l.RemoveDuplicates();
             l.RemoveEmpty();
             if (!l.IsEmpty()) {
@@ -362,9 +390,9 @@ void CPlatform::Read(const TiXmlElement *PlatformRoot)
     {
         CString s;
         CStringList l;
-        Read(PlatformRoot,"dynamic_lib_ext",s);
+        Read(PlatformRoot, "dynamic_lib_ext", s);
         if (!s.IsEmpty()) {
-            ParseStr(s,' ',l);
+            ParseStr(s, ' ', l);
             l.RemoveDuplicates();
             l.RemoveEmpty();
             if (!l.IsEmpty()) {
@@ -378,7 +406,7 @@ void CPlatform::Read(const TiXmlElement *PlatformRoot)
 void CPlatform::Write(TiXmlElement *Root, const CString& Name, const CString& Value)
 {
     TiXmlElement *command = new TiXmlElement("command");
-    command->SetAttribute(Name.GetCString(),Value.GetCString());
+    command->SetAttribute(Name.GetCString(), Value.GetCString());
     Root->LinkEndChild(command);
 }
 
@@ -488,53 +516,40 @@ void CPlatformSet::AddDefault(void)
 {
     if (m_Locked) return;
     CPlatform *p = Find(CPlatform::OS_Unix);
-    if (0==p) {
+    if (0 == p) {
         p = new CPlatform();
         p->Reset(CPlatform::OS_Unix);
         m_Platforms.push_back(p);
     }
     p = Find(CPlatform::OS_Windows);
-    if (0==p) {
+    if (0 == p) {
         p = new CPlatform();
         p->Reset(CPlatform::OS_Windows);
         m_Platforms.push_back(p);
     }
     p = Find(CPlatform::OS_Mac);
-    if (0==p) {
+    if (0 == p) {
         p = new CPlatform();
         p->Reset(CPlatform::OS_Mac);
         m_Platforms.push_back(p);
     }
+    p = Find(CPlatform::OS_MSys);
+    if (0 == p) {
+        p = new CPlatform();
+        p->Reset(CPlatform::OS_MSys);
+        m_Platforms.push_back(p);
+    }
 }
-
-/*
-CPlatform *CPlatformSet::Add(const CString& Platform)
-{
- if (m_Locked) return 0;
- CPlatform *p = new CPlatform();
- p->m_Name = Platform;
- m_Platforms.push_back(p);
- return p;
-}
-
-void CPlatformSet::Remove(const CString& Platform)
-{
- if (m_Locked) return;
- CPlatform *p = Find(Platform);
- if (0!=p)
- {
-  m_Platforms.erase(std::find(m_Platforms.begin(),m_Platforms.end(),p));
-  delete p;
- }
-}
-*/
 
 void CPlatformSet::Read(const TiXmlElement *ConfigRoot)
 {
     TiXmlNode *_platform = (TiXmlNode *)ConfigRoot->FirstChild("platform");
-    while (0!=_platform) {
+    while (0 != _platform) {
+
         TiXmlElement* platform = _platform->ToElement();
-        if (strcmp(platform->Value(),"platform")!=0) break;
+
+        if (strcmp(platform->Value(), "platform") !=0 )
+            break;
         if (0!=platform) {
             CPlatform *p = new CPlatform();
             p->Read(platform);
@@ -553,33 +568,6 @@ void CPlatformSet::Write(TiXmlElement *ConfigRoot)
         ConfigRoot->LinkEndChild(p_root);
     }
 }
-
-/*
-bool CPlatformSet::Load(const CString& FileName)
-{
- if (m_Locked) return false;
- TiXmlDocument cfg;
- if (!cfg.LoadFile(FileName.GetCString())) return false;
- const TiXmlElement *root = cfg.RootElement();
- if (0==strcmp(root->Value(),"cbp2make"))
- {
-  Read(root);
- } // root
- if (0==m_Platforms.size()) AddDefault();
- return true;
-}
-
-bool CPlatformSet::Save(const CString& FileName)
-{
- TiXmlDocument cfg;
- TiXmlDeclaration *xmld = new TiXmlDeclaration("1.0", "", "");
-	cfg.LinkEndChild(xmld);
-	TiXmlElement *root = new TiXmlElement("cbp2make");
-	cfg.LinkEndChild(root);
-	Write(root);
- return cfg.SaveFile(FileName.GetCString());
-}
-*/
 
 void CPlatformSet::Show(void)
 {

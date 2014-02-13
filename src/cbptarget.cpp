@@ -1,6 +1,7 @@
 /*
     cbp2make : Makefile generation tool for the Code::Blocks IDE
     Copyright (C) 2010-2013 Mirai Computing (mirai.computing@gmail.com)
+    Copyright (C) 2014      Sergey "dmpas" Batanov (sergey.batanov (at) dmpas (dot) ru)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -185,6 +186,7 @@ CString CBuildTarget::AutoFileExtension(const CPlatform::OS_Type OS, const CBuil
         }
         break;
     }
+    case CPlatform::OS_MSys:
     case CPlatform::OS_Windows: {
         switch (Type) {
         case CBuildTarget::ttConsoleExecutable: {
