@@ -417,6 +417,12 @@ void CBuildTarget::Read(const TiXmlElement *TargetRoot)
             if ((value = (char *)option->Attribute("platforms"))) {
                 ParseStr(value,';',m_Platforms);
                 m_Platforms.RemoveEmpty();
+
+                if (m_Platforms.FindString("Windows") != INVALID_INDEX
+                    && m_Platforms.FindString("MSys") == INVALID_INDEX) {
+                    m_Platforms.Insert("MSys");
+                }
+
             }
             if ((value = (char *)option->Attribute("output"))) {
                 m_Output = value;
