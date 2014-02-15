@@ -877,6 +877,12 @@ void CGNUWindowsResourceCompiler::Reset(const CPlatform::OS_Type OS)
     m_TargetExtension = "o";
     if (CPlatform::OS_Windows==OS) m_Program = "windres.exe";
     else m_Program = "windres";
+
+    if (!Supports(OS)) {
+        /* Generate fake resource file */
+        m_Program = "";
+        m_CommandTemplate = "gcc -x c -c -o $resource_output /dev/null";
+    }
 }
 
 bool CGNUWindowsResourceCompiler::Supports(const CPlatform::OS_Type OS)
