@@ -756,7 +756,14 @@ bool CCodeBlocksProject::GenerateMakefile
                     CString path, name, ext;
                     SplitFilePathName(target_output, path, name, ext);
 
-                    CString static_output = path + pl->Pd() + "lib" + name + ".a";
+                    const char *c_name = name.GetCString();
+                    CString lib_prefix =
+                            (strstr(c_name, "lib") == c_name) && !strstr(c_name, "library")
+                            ? ""
+                            : "lib"
+                    ;
+
+                    CString static_output = path + pl->Pd() + lib_prefix + name + ".a";
 
                     m_Makefile.AddMacro(target->Name(STR_DEF + "_", Config.MacroVariableCase()),
                       CGlobalVariable::Convert(
