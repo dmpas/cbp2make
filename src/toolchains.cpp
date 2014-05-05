@@ -421,10 +421,15 @@ CAssembler *CToolChain::FindAssembler(const CString& FileExtension)
 CCompiler *CToolChain::FindCompiler(const CString& FileExtension)
 {
     CCompiler *result = 0;
+
     result = dynamic_cast<CCompiler *>(FindBuildTool(FileExtension,(std::vector<CBuildTool *>&)m_Compilers));
-    if (0!=result) return result;
+    if (0 != result)
+        return result;
+
     result = dynamic_cast<CCompiler *>(FindBuildTool(FileExtension,(std::vector<CBuildTool *>&)m_Assemblers));
-    if (0!=result) return result;
+    if (0 != result)
+        return result;
+
     result = dynamic_cast<CCompiler *>(FindBuildTool(FileExtension,(std::vector<CBuildTool *>&)m_ResourceCompilers));
     return result;
 }

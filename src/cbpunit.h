@@ -41,10 +41,19 @@ private:
     int m_Weight;
     //
     CString m_ObjectFileName;
+    CString m_CustomBuildCommand;
 public:
     CString FileName(void) const
     {
         return m_FileName;
+    }
+    CString CustomBuildCommand() const
+    {
+        return m_CustomBuildCommand;
+    }
+    bool HasCustomBuild() const
+    {
+        return m_CustomBuildCommand.GetLength() != 0;
     }
     CString Extension(void) const;
     bool BelongToTarget(const CString& TargetName);

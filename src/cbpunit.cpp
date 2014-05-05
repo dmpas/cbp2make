@@ -64,11 +64,14 @@ void CBuildUnit::Read(const TiXmlElement *UnitRoot)
         m_FileName = value;
     }
     TiXmlNode *_option = (TiXmlNode *)UnitRoot->FirstChild("Option");
-    while (0!=_option) {
+    while (0 != _option) {
         TiXmlElement* option = _option->ToElement();
-        if (0!=option) {
+        if (0 != option) {
             char *value = 0;
             if ((value = (char *)option->Attribute("compilerVar"))) {
+                m_CompilerVariable = value;
+            }
+            if ((value = (char *)option->Attribute("compiler"))) {
                 m_CompilerVariable = value;
             }
             if ((value = (char *)option->Attribute("compile"))) {
@@ -82,6 +85,10 @@ void CBuildUnit::Read(const TiXmlElement *UnitRoot)
             }
             if ((value = (char *)option->Attribute("weight"))) {
                 m_Weight = StringToInteger(value);
+            }
+            if ((value = (char *)option->Attribute("buildCommand"))) {
+                m_CustomBuildCommand = value;
+                m_CustomBuildCommand = FindReplaceStr(m_CustomBuildCommand, "\\n", "\n\t");
             }
         }
         _option = (TiXmlNode *)UnitRoot->IterateChildren(_option);

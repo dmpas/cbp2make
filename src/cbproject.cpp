@@ -247,17 +247,23 @@ void CCodeBlocksProject::Read(const TiXmlElement *ProjectRoot)
                 _option = (TiXmlNode *)_extra_cmd->IterateChildren(_option);
             } // option
         } // extra commands
+
         TiXmlNode *_unit = (TiXmlNode *)_project->FirstChild("Unit");
-        while (0!=_unit) {
+        while (0 != _unit) {
             TiXmlElement* unit = _unit->ToElement();
-            if (0!=unit) {
-                if (strcmp(unit->Value(),"Unit")) break;
+            if (0 != unit) {
+
+                if (strcmp(unit->Value(),"Unit"))
+                    break;
+
                 CBuildUnit *build_unit = new CBuildUnit();
                 build_unit->Read(unit);
                 m_Units.push_back(build_unit);
+
             }
             _unit = (TiXmlNode *)_project->IterateChildren(_unit);
         } // unit
+
     } // project
 // add default target if project has no targets
     if (m_BuildTargets.size()==0) {
@@ -1049,7 +1055,12 @@ bool CCodeBlocksProject::GenerateMakefile
                              <<" compile "<<unit->m_DoCompile
                              <<" link "<<unit->m_DoLink<<std::endl;
                     */
-                    if (0==compiler) {
+                    if (0 == compiler) {
+                        if (unit->HasCustomBuild()) {
+                            compiler = new CustomCompiler(unit->CustomBuildCommand(), unit->CompilerVariable());
+                        }
+                    }
+                    if (0 == compiler) {
                         if (unit->DoCompile() && unit->CompilerVariable().IsEmpty()) {
                             if (Config.BeVerbose()) {
                                 std::cout<<"Warning: compiler for unit #"<<(i+1)<<" '"

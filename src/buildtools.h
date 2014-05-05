@@ -725,6 +725,16 @@ public:
     CMSVCBuildManager(void);
 };
 
+class CustomCompiler: public CCompiler
+{
+public:
+    virtual CustomCompiler *CreateInstance(void);
+    virtual void Reset(const CPlatform::OS_Type OS);
+    CustomCompiler(void);
+    CustomCompiler(const CString &BuildCommand, const CString &CompilerVar);
+};
+
+
 //------------------------------------------------------------------------------
 
 static const CString TPL_COMPILER        = "$compiler";

@@ -2128,4 +2128,42 @@ bool CMSVCNativeExecutableLinker::Supports(const CPlatform::OS_Type OS)
     return (CPlatform::OS_Windows==OS);
 }
 
+
+CustomCompiler::CustomCompiler(void)
+{
+    Reset(CPlatform::OS_Other);
+}
+
+CustomCompiler *CustomCompiler::CreateInstance(void)
+{
+    return new CustomCompiler(*this);
+}
+
+void CustomCompiler::Reset(const CPlatform::OS_Type OS)
+{
+    CCompiler::Reset(OS);
+    m_Type = btCompiler;
+    m_Alias = "custom_compiler";
+    m_Description = "Custom command line";
+    m_MakeVariable = "CUSTOM";
+    m_CommandTemplate = "$buildCommand";
+    m_SourceExtensions.Clear();
+    m_TargetExtension = "o";
+    m_Program = "";
+}
+
+
+CustomCompiler::CustomCompiler(const CString &BuildCommand, const CString &CompilerVar)
+{
+    CCompiler::Reset(CPlatform::OS_Other);
+    m_Type = btCompiler;
+    m_Alias = "custom_compiler";
+    m_Description = "Custom command line";
+    m_MakeVariable = CompilerVar;
+    m_CommandTemplate = BuildCommand;
+    m_SourceExtensions.Clear();
+    m_TargetExtension = "o";
+    m_Program = "";
+}
+
 //------------------------------------------------------------------------------
