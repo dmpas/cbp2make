@@ -144,6 +144,12 @@ CString CPlatform::SpecialChars(void) const
 
 CString CPlatform::ProtectPath(const CString& Path, const int QuoteMode)
 {
+    if (Path.GetLength() > 0) {
+        if (Path.GetFirstChar() == '$') {
+            /* Do not change paths like '$(SOME_VAR)' */
+            return Path;
+        }
+    }
     if (m_OS_Type==OS_Windows) {
         //return QuoteSpaces(Path,QuoteMode);
         return ShieldChars(Path,this->SpecialChars());
