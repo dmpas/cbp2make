@@ -109,6 +109,7 @@ void CProcessingMachine::DisplayHelpMessage(void)
              "\tManage options:\n"
              "\t\tcbp2make --config options --default-options \"<options>\"\n"
              "\t\tcbp2make --config show\n\n"
+             "\t\tcbp2make --config inherit\t// copy configuration into local\n"
              "\tCommon options:\n"
              "\t\tcbp2make --local\t// use configuration from current directory\n"
              "\t\tcbp2make --global\t// use configuration from home directory\n"
@@ -410,7 +411,7 @@ bool CProcessingMachine::Configure(const CString& FileName)
     m_BuildManager.Config().Platforms().AddDefault();
     if (PSC().VarDefined("--config")) {
         CString config_item_str = PSC().VarNamed("--config").GetString();
-        int config_item = GuessStr(config_item_str,"toolchain tool platform variable options",
+        int config_item = GuessStr(config_item_str,"toolchain tool platform variable options inherit",
                                    config_item_str,true);
         if (0==config_item) {
             CString chain_name = PSC().VarNamed("-chain").GetString();
@@ -505,6 +506,12 @@ bool CProcessingMachine::Configure(const CString& FileName)
                 }
             } // remove variable
         } // config variable
+
+        if (5 == config_item) {
+            /* Inherit */
+            cfg_name = ConfigurationName();
+        }
+
         if (config_item < 0) m_BuildManager.Config().Show();
         std::cout<<"Saving configuration: "<<cfg_name.GetCString()<<std::endl;
         m_BuildManager.Config().Save(cfg_name);
