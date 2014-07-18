@@ -85,13 +85,27 @@ CString ExtractFileName(const CString& FilePathName)
 
 CString ExtractFileExt(const CString& FilePathName)
 {
- CString result;
- int pos = LastCharPos(FilePathName,'.');
- if (pos >= 0)
- {
-  result = RightStr(FilePathName,pos+1);
- }
- return result;
+    CString result;
+    int pos = LastCharPos(FilePathName,'.');
+    if (pos >= 0) {
+        /* Check if this is a version like libxml-2.6 */
+
+        int cpos = pos - 1;
+        while (cpos >= 0) {
+
+            if (FilePathName[cpos] == '-')
+                return result;
+
+            if (!isdigit(FilePathName[cpos])) {
+                /* non-numeric character - not a version tag */
+                break;
+            }
+            --cpos;
+        }
+
+        result = RightStr(FilePathName, pos + 1);
+    }
+    return result;
 }
 
 void SplitFilePathName(const CString& FilePathName, CString& FilePath, CString& FileName, CString& FileExt)
